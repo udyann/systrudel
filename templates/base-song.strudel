@@ -1,0 +1,93 @@
+// Base song — user's composition, 120 BPM / four beats per cycle, D minor.
+// In-app adaptation: src/music/base-song.js.
+// Live mappings use energy, density, tension and balance.
+// Melody gains: piano = 1 - balance; trombone = 0.5 * balance.
+setcpm(120 / 4)
+const energy = 0.1
+const density = 0.5
+const tension = 0.9
+const balance = 0.5
+const intensity = 0.3
+const ambience = 0.4
+const lerp = (a, b, x) => a + (b - a) * x
+const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x))
+const s0 = sound("[rd rd, bd bd, - -]")
+const s1 = sound("[rd rd, - -, sd [- sd]]")
+const s2 = sound("[rd rd, - [bd bd], [- sd] -]")
+const s3 = sound("[rd rd, - -, sd -]")
+const s4 = sound("[rd rd, - -, [- sd] -]")
+const s5 = sound("[rd rd, - -, sd [- sd]]")
+const s6 = sound("[rd rd, - [bd bd], - -]")
+const s7 = sound("[rd rd, - -, sd [sd sd]]")
+const drumMutation =
+  clamp((density * 0.55 + tension * 0.45) * 0.35)
+const randomDrum = () =>
+  chooseCycles(s0, s1, s2, s3, s4, s5, s6, s7)
+const mutateDrum = (base) =>
+  wchooseCycles(
+    [base, 1 - drumMutation],
+    [randomDrum(), drumMutation]
+  )
+$: seq(
+  mutateDrum(s0),
+  mutateDrum(s1),
+  mutateDrum(s2),
+  mutateDrum(s3),
+  mutateDrum(s4),
+  mutateDrum(s5),
+  mutateDrum(s6),
+  mutateDrum(s7)
+)
+  .slow(2)
+  .bank("sr16")
+  .velocity(lerp(0.30, 0.75, energy))
+  .lpf(lerp(800, 9000, energy))
+  .sometimesBy(density*0.03, x => x.speed(-1))
+
+const bassKeep = lerp(0.1, 0.90, density)
+const bassDistort = lerp(0.0, 1.2, tension)
+const bassAttack = lerp(0.08, 0.005, energy)
+const bassDecay = lerp(0.25, 0.08, energy)
+const bassSustain = lerp(0.30, 0.65, energy)
+const bassRelease = lerp(0.35, 0.08, energy)
+$: n(`[0@2 - 0  0 3 4 5  - 0@2 2  0 3@2 0]`)
+  .slow(2)
+  .scale("D2:minor")
+  .degradeBy(1 - bassKeep)
+  .sometimesBy(0.08, x => x.add(chooseCycles(-1, 1)))
+  .sometimesBy(bassKeep, x => x.ply(2))
+  .sound("gm_synth_bass_2")
+  .lpf(500)
+  .distort(bassDistort)
+  .attack(bassAttack)
+  .decay(bassDecay)
+  .sustain(bassSustain)
+  .release(bassRelease)
+  .velocity(0.4)
+  .gain(0.8)
+
+const userMotif = n(`[[7, 5]@2.5 6@0.5 [5 3] [6, 4]@3 [- [5 6]] [6,3]@3 [- 7] [[5,2]@2 [4,1]] [3,0]@2 - ]`).slow(4).scale("D4:minor")
+const melodyKeep = 1
+const melodyTensionProb = lerp(0.02, 0.12, tension)
+$: userMotif
+  .degradeBy(1 - melodyKeep)
+  .sometimesBy(0.005, x => x.scaleTranspose(1))
+  .sound("gm_epiano2")
+  .velocity(lerp(0.25, 0.65, energy))
+  .gain(1 - balance)
+  .lpf(lerp(1200, 6500, energy))
+  .attack(lerp(0.08, 0.01, energy))
+  .release(lerp(0.5, 0.12, energy))
+  .room(0.25)
+
+const agentMotif = n(`[0 2 4 6 <5 -> 2 3 0]`).slow(2).scale("D4:minor")
+$: agentMotif
+  .degradeBy(1 - melodyKeep)
+  .sometimesBy(0.005, x => x.scaleTranspose(1))
+  .sound("gm_trombone")
+  .velocity(lerp(0.25, 0.65, energy))
+  .gain(0.5 * balance)
+  .lpf(lerp(1200, 6500, energy))
+  .attack(lerp(0.08, 0.01, energy))
+  .release(lerp(7, 0.12, energy))
+  .room(0.7)

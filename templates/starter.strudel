@@ -1,0 +1,33 @@
+// PhotoSynthRudel template draft — copy this whole file into https://strudel.cc/
+// Name: Warm steps
+// Tempo: 96 BPM; 4 beats per cycle
+// Key: C minor
+// Sounds: built-in sawtooth and triangle; no external samples
+// Desired image control: brightness -> melody cutoff, 200–6000 Hz
+// Keep fixed: notes, rhythm, bass filter, and relative layer levels
+
+setcpm(96 / 4)
+
+// Edit these values and reevaluate to audition the controls.
+const cutoff = 1400
+const level = 0.2
+
+stack(
+  note("c4 eb4 g4 bb4 g4 eb4 d4 eb4")
+    .s("sawtooth")
+    .attack(0.015)
+    .decay(0.12)
+    .sustain(0.25)
+    .release(0.1)
+    .lpf(cutoff)
+    .gain(level),
+
+  note("c2 ~ c2 ~")
+    .s("triangle")
+    .attack(0.01)
+    .decay(0.15)
+    .sustain(0.3)
+    .release(0.08)
+    .lpf(600)
+    .gain(level * 0.7)
+)

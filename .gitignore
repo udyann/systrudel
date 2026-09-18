@@ -1,0 +1,29 @@
+node_modules/
+.local/
+dist/
+.npm-cache/
+*.log
+.DS_Store
+
+# Keep local settings, credentials and machine-specific paths private.
+.env
+.env.*
+!.env.example
+.codex/
+.agents/
+.vscode/
+.idea/
+.npmrc
+.yarnrc.yml
+*.pem
+*.key
+*.p12
+*.pfx
+Thumbs.db
+
+# Local diagnostics, activity exports and recordings.
+coverage/
+recordings/
+exports/
+photosynthrudel-*.json
+scripts/repair-hook-path-case.py
