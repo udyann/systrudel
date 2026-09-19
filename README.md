@@ -37,7 +37,11 @@ Camera/image 입력도 사용할 수 있지만, 현재는 주요 입력이 아�
 
 
 ## Demo
-<video src="./demo_video.mp4" controls width="100%"></video>
+
+
+https://github.com/user-attachments/assets/839634b7-012e-4ecc-85cf-c352a21ceb3b
+
+
 
 
 ## Dependencies
