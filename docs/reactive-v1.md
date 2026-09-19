@@ -1,6 +1,6 @@
 # Reactive V1: inputs and template contract
 
-Run `npm run dev` from `C:\photosynthrudel`, then open <http://localhost:5173>.
+Run `npm run dev` from the project folder, then open <http://localhost:5173>.
 This starts Vite and a loopback-only Node companion on port 4317. Stop with Ctrl+C.
 If Vite is already running, restart it for the new proxy configuration. For separate
 terminals use `npm run telemetry` and `npm run dev:ui`. Production preview also
@@ -222,15 +222,15 @@ At EOF, the last rates remain visible until that expiry.
 
 ## Codex app / CLI lifecycle hooks
 
-`integrations/codex/hooks.example.json` is a prepared configuration for the
-installed project path. Merge its `hooks` entries into a supported, trusted
-Codex config layer (`<repo>/.codex/hooks.json` or your user hooks file). Preserve
-existing hooks. If the project moves, update the absolute script path.
+Run `npm run agent:setup` to generate `.codex/hooks.json` for this checkout.
+The shareable `integrations/codex/hooks.example.json` uses a path placeholder;
+replace it with your checkout path when merging into existing configurations.
+Setup preserves existing files. If the project moves, update absolute paths.
 
 Codex requires reviewing/trusting each hook definition; OpenAI documents `/hooks`
 in the interactive CLI for review if your extension lacks hook controls. Reload
 the Codex session as required by your client. The project configuration is
-installed in `.codex/hooks.json`; its trust decision remains yours. Global Codex
+generated in `.codex/hooks.json`; its trust decision remains yours. Global Codex
 configuration is not modified.
 
 Hooks write tool start/end, turn start/end, and subagent lifecycle counters to

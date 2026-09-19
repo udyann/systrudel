@@ -50,7 +50,7 @@ export function createReactiveDashboard(root) {
   q('#windows-activity').addEventListener('change', async event => {
     const control = event.target; control.disabled = true; humanPending = true;
     try {
-      const response = await fetch('/api/human', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-PhotoSynthRudel': '1' }, body: JSON.stringify({ enabled: control.checked }), signal: AbortSignal.timeout(5000) });
+      const response = await fetch('/api/human', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-systrudel': '1' }, body: JSON.stringify({ enabled: control.checked }), signal: AbortSignal.timeout(5000) });
       if (!response.ok) throw new Error('Could not change Windows tracking. Check the companion terminal.');
       q('#human-help').textContent = control.checked ? 'Starting Windows counters. Tracking continues until disabled or the companion stops.' : 'Windows tracking stopped. This page still counts its own activity.';
     } catch (error) { control.checked = !control.checked; q('#human-help').textContent = error.message; }
@@ -94,7 +94,7 @@ export function createReactiveDashboard(root) {
   q('#export-trial').addEventListener('click', () => {
     const blob = new Blob([JSON.stringify({ version: 1, label: trialLabel, samples: records }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob), link = document.createElement('a');
-    link.href = url; link.download = `photosynthrudel-${Date.now()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    link.href = url; link.download = `systrudel-${Date.now()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
   function readings(selector, values) {
     const list = q(selector);

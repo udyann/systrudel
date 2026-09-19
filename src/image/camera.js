@@ -59,7 +59,7 @@ export function createCamera({ video, onFrame, onError }, environment = globalTh
     pending = true;
     try {
       if (!environment.isSecureContext) {
-        throw new Error('Camera access needs HTTPS or localhost. Open this app at http://localhost:5173 on this laptop.');
+        throw new Error('Camera access needs HTTPS or localhost. Open the localhost URL printed by npm run dev on this laptop.');
       }
       if (!environment.navigator.mediaDevices?.getUserMedia) {
         throw new Error('Camera access is unavailable in this browser. Try a current version of Chrome, Edge, or Firefox.');

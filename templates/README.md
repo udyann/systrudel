@@ -1,4 +1,4 @@
-# Writing PhotoSynthRudel templates
+# Writing systrudel templates
 
 The reactive dashboard publishes six numeric controls: `energy`, `density`,
 `tension`, `balance`, `intensity`, and `ambience`, all from 0 to 1. See the

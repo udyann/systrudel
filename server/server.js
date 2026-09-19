@@ -34,7 +34,7 @@ export async function startCompanion({ port = config.companionPort, uiPort = con
       clients.add(res); res.on('close', () => clients.delete(res)); return;
     }
     if (req.method !== 'POST' || !['/api/agent', '/api/human'].includes(req.url)) return reply(404, { error: 'Not found' });
-    if (req.url === '/api/agent' ? !authorized(req) : !(authorized(req) || (origin && req.headers['x-photosynthrudel'] === '1'))) return reply(403, { error: 'Authorization required' });
+    if (req.url === '/api/agent' ? !authorized(req) : !(authorized(req) || (origin && req.headers['x-systrudel'] === '1'))) return reply(403, { error: 'Authorization required' });
     if (!req.headers['content-type']?.startsWith('application/json')) return reply(415, { error: 'JSON required' });
     try {
       let body = '', length = 0;

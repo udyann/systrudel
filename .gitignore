@@ -25,5 +25,7 @@ Thumbs.db
 coverage/
 recordings/
 exports/
-photosynthrudel-*.json
+systrudel-*.json
+# Timestamped comparison exports, including recordings made before a rename.
+*-1[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].json
 scripts/repair-hook-path-case.py

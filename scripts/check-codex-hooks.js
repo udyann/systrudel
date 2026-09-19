@@ -9,7 +9,7 @@ import { hookCommand } from './setup-codex-hooks.js';
 
 const workspace = resolve(fileURLToPath(new URL('../', import.meta.url)));
 const roots = process.platform === 'win32' ? [...new Set([workspace[0].toUpperCase() + workspace.slice(1), workspace[0].toLowerCase() + workspace.slice(1)])] : [workspace];
-const executable = process.env.PHOTOSYNTH_CODEX_EXECUTABLE ?? 'codex';
+const executable = process.env.SYSTRUDEL_CODEX_EXECUTABLE ?? 'codex';
 const child = spawn(executable, ['app-server'], { cwd: workspace, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
 child.stderr.resume();
 const lines = createInterface({ input: child.stdout });
@@ -19,7 +19,7 @@ try {
   const result = await new Promise((resolveResult, reject) => {
     const timeout = setTimeout(() => reject(new Error('Codex hook inspection timed out')), 15000);
     const finish = (error, result) => { clearTimeout(timeout); error ? reject(error) : resolveResult(result); };
-    child.on('error', error => finish(new Error(`Could not start the local Codex backend (${error.code}). Set PHOTOSYNTH_CODEX_EXECUTABLE to its executable path.`)));
+    child.on('error', error => finish(new Error(`Could not start the local Codex backend (${error.code}). Set SYSTRUDEL_CODEX_EXECUTABLE to its executable path.`)));
     child.on('exit', code => finish(new Error(`Codex backend exited before answering (${code})`)));
     lines.on('line', line => {
       let message; try { message = JSON.parse(line); } catch { return; }
@@ -30,7 +30,7 @@ try {
       }
       if (message.id === 2) message.error ? finish(new Error(message.error.message)) : finish(null, message.result);
     });
-    send({ id: 1, method: 'initialize', params: { clientInfo: { name: 'photosynthrudel_diagnostics', version: '1.0.0' }, capabilities: { experimentalApi: true } } });
+    send({ id: 1, method: 'initialize', params: { clientInfo: { name: 'systrudel_diagnostics', version: '1.0.0' }, capabilities: { experimentalApi: true } } });
   });
   const normalizeCommand = command => process.platform === 'win32' ? command?.toLowerCase() : command;
   const expectedCommands = [hookCommand(workspace), `node ${workspace.replaceAll('\\', '/')}/scripts/codex-hook.js`].map(normalizeCommand);

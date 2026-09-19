@@ -1,85 +1,72 @@
-# Codex IDE integration
+# Codex IDE activity
 
-PhotoSynthRudel targets your normal Codex IDE sidebar workflow. Start the music
-app with `npm run dev`, then work in Codex as usual. No `codex exec` task or
-account API connection is required for this integration.
+Use your normal Codex sidebar while systrudel plays locally. This optional
+integration observes turn, tool and subagent lifecycle events. It does not need
+an account API key or require tasks through `codex exec`.
 
-## One-time setup for this workspace
+## Set up your clone
 
-The project hook configuration is `.codex/hooks.json`. It calls
-`scripts/codex-hook.js`, which writes aggregate lifecycle events to a local inbox
-read by the PhotoSynthRudel companion. The definition is also kept in
-`hooks.example.json`. It requires no HTTP token or network connection.
+1. From the systrudel project folder, run:
 
-1. Open `C:\photosynthrudel` in your IDE and reload the Codex extension/session
-   so it discovers the project configuration.
-2. Review and trust the PhotoSynthRudel hooks in Codex's hook controls if your
-   installed extension exposes them. New hook definitions are skipped until
-   trusted; PhotoSynthRudel does not grant that trust on your behalf.
-3. Keep `npm run dev` running. Send an ordinary request in the Codex sidebar
-   and check the dashboard's agent panel while it runs.
+   ```powershell
+   npm run agent:setup
+   ```
 
-OpenAI documents `/hooks` in the interactive CLI as the hook-review interface.
-If your extension does not expose review controls, that is a one-time setup
-option: open `codex` in this workspace, use `/hooks`, and exit after reviewing
-the definitions. Your subsequent work stays in the IDE; do not run tasks through
-`codex exec` for this integration.
+   This creates an ignored `.codex/hooks.json` with absolute script paths for
+   your checkout. Existing files are left unchanged. To merge into an existing
+   configuration, use [hooks.example.json](hooks.example.json), replacing
+   `__SYSTRUDEL_ROOT__` with your checkout's absolute path.
+2. Open this folder in your IDE with a Codex client that supports lifecycle
+   hooks. Review [`scripts/codex-hook.js`](../../scripts/codex-hook.js), then
+   review/trust its definitions using Codex's controls. The project configuration
+   layer must also be trusted.
+3. If the IDE lacks hook review controls, OpenAI documents `/hooks` in the
+   interactive CLI. Run `codex` in this same folder, use `/hooks` to review the
+   definitions, then exit. Subsequent work stays in the IDE. systrudel does not
+   grant trust automatically.
+4. Reload the IDE's Codex session, keep `npm run dev` running, and send an ordinary
+   request in the sidebar. The dashboard should show **Working**, then **Idle**.
 
-Project-local hooks apply only when the project configuration layer is trusted.
-This installation covers Codex sessions rooted in this workspace. For another
-workspace, install the same hook definitions there with the script path pointing
-back to this PhotoSynthRudel checkout. Do not enable both a second event bridge
-and these hooks for the same session.
+Hooks apply to sessions in the configured workspace. For another work project,
+merge these hook entries into that project's configuration, keeping script paths
+pointed at this systrudel checkout, then review them there. Avoid duplicate feeds
+for the same session. If the checkout moves, update absolute hook paths and
+review the changed definitions again.
 
-## Check IDE hooks
+## Check the connection
 
-Run `npm run agent:check` in this project. This asks the installed local Codex
-backend to list hooks, without launching an AI task or changing configuration.
-On Windows it checks both drive-letter spellings. A Codex path-casing issue was
-observed here: `c:\photosynthrudel` was trusted while `C:\photosynthrudel` was
-untrusted despite identical hook hashes. Both variants have now been repaired
-using only the user's existing approvals for these unchanged definitions.
+```powershell
+npm run agent:check
+```
 
-The read-only check writes `.local/codex-hook-check.json`. If the mismatch occurs
-again, `python scripts/repair-hook-path-case.py` previews a narrowly scoped
-repair based on that fresh report; `--apply` adds only missing path aliases that
-match an already-trusted hash and the same physical hook file. It refuses changed
-definitions or existing alias decisions. It does not approve new hooks.
+This asks a local Codex backend to list hooks without starting an AI task or
+changing trust. If it cannot start `codex`, set `SYSTRUDEL_CODEX_EXECUTABLE` in
+`.env` to the native backend executable used by your installed client. Diagnostics
+require a backend supporting `hooks/list`; they cannot prove an already-running
+IDE session loaded the configuration.
 
-If all hooks are trusted but activity has never arrived, reload the IDE extension
-and start a normal turn in this workspace. An already-open IDE backend can retain
-old configuration. The companion must be running to display updates; hooks fired
-while it is offline are queued briefly. A successful hook command alone does not
-prove a real IDE session has loaded the hooks.
+- **Companion connected, waiting for IDE activity:** telemetry is reachable but
+  no IDE event arrived. Check installation, trust, workspace root and IDE reload,
+  then start a new turn.
+- **No hooks discovered:** run setup; existing configurations may need a merge.
+- **Untrusted/disabled hooks:** review them in Codex. Changed commands need review.
+- **Different Windows drive-letter casing:** open the project using the same path
+  spelling used during hook review. Diagnostics check both spellings and save
+  a private report in `.local/codex-hook-check.json`.
+- **Unknown after a quiet turn:** an unconfirmed open turn expires after 15 minutes;
+  a new lifecycle event can restore activity.
 
-## Available activity
+## What the indicator means
 
-- User turn starts, completion, and interruption.
-- Tool-call starts and completions.
-- Observed subagent starts and stops.
-- Session lifecycle.
+The panel shows open turns, running tools, recent tool calls and observed
+subagents. **Working** means an observed turn remains open, including waiting
+for approval or a tool. It is not a live inference measurement. Token rates,
+streamed output and hidden reasoning are unavailable through these hooks.
 
-The panel shows Working, Idle, Waiting for IDE activity, or Status unknown, plus
-the last event, open turns, running tools, recent tool calls and observed subagents.
-Unsupported output/token/reasoning metrics have been removed from this panel.
+The handler writes counts, timestamps and opaque IDs to `.local/codex-inbox/`.
+It discards prompt/tool payloads and never reads transcripts. The companion
+checks every 250 ms and deletes consumed entries. The queue is bounded to
+roughly 512 entries; entries expire after 15 minutes. Write failures remain
+advisory so they do not block your work.
 
-Working means an observed turn remains open; this can include waiting for approval
-or another tool. A quiet turn stays open until Stop, Interrupt or SessionEnd,
-with a 15-minute quiet timeout to Unknown when no completion is observed. It is a
-lifecycle indicator, not proof the model is generating at that instant. An idle
-session does not become disconnected merely because it sends no heartbeats.
-
-The handler stores counts, timestamps and opaque IDs only in
-`.local/codex-inbox/`. It does not read transcripts, retain prompts, or store tool
-arguments/results. Writes are atomic. The companion checks every 250 ms and
-deletes consumed entries. The queue is bounded to roughly 512 entries and entries
-older than 15 minutes are discarded. If the companion is offline, hooks still
-exit successfully; if the local write itself fails, the hook remains advisory.
-`GET /api/snapshot` includes counter-only `hookDiagnostics` for delivery checks.
-
-The installed IDE extension and its bundled Codex backend were inspected for
-hook support. Receiving events from your actual IDE session still requires the
-trust/reload steps above and an ordinary request from you.
-
-Sources: [shared IDE configuration](https://learn.chatgpt.com/docs/developer-settings?surface=ide),
-[Codex lifecycle hooks and trust](https://learn.chatgpt.com/docs/hooks).
+Reference: [OpenAI hook configuration and review](https://learn.chatgpt.com/docs/hooks).

@@ -4,7 +4,7 @@ import { startCompanion } from '../server/server.js';
 
 test('companion serves counters, streams updates and guards mutations', async t => {
   let enabled = false, closed = false;
-  const companion = await startCompanion({ port: 0, sessionFile: null, hookDirectory: null, collectors: {
+  const companion = await startCompanion({ port: 0, uiPort: 5173, previewPort: 4173, sessionFile: null, hookDirectory: null, collectors: {
     snapshot: () => ({ system: { cpu: 42 }, human: null, humanStatus: enabled ? 'on' : 'off' }),
     setHuman: value => { enabled = value; }, close: () => { closed = true; },
   } });
@@ -18,9 +18,9 @@ test('companion serves counters, streams updates and guards mutations', async t 
   assert.equal((await post('/api/agent', { source: 'test', kind: 'output', count: 42 }, auth)).status, 200);
   assert.equal((await post('/api/agent', { source: 'test', kind: 'output', count: 42, prompt: 'secret' }, auth)).status, 400);
   assert.equal((await post('/api/agent', ' '.repeat(17000), auth)).status, 413);
-  assert.equal((await post('/api/human', { enabled: true }, { Origin: 'http://localhost:5173', 'X-PhotoSynthRudel': '1' })).status, 200);
+  assert.equal((await post('/api/human', { enabled: true }, { Origin: 'http://localhost:5173', 'X-systrudel': '1' })).status, 200);
   assert.equal(enabled, true);
-  assert.equal((await post('/api/human', { enabled: false }, { Origin: 'https://example.com', 'X-PhotoSynthRudel': '1' })).status, 403);
+  assert.equal((await post('/api/human', { enabled: false }, { Origin: 'https://example.com', 'X-systrudel': '1' })).status, 403);
   const controller = new AbortController();
   const stream = await fetch(`${base}/api/events`, { signal: controller.signal });
   const reader = stream.body.getReader();

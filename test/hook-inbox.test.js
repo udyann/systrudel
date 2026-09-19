@@ -10,7 +10,7 @@ import { normalizeHook } from '../server/codex-events.js';
 import { enqueueHookEvents, createHookInbox, MAX_HOOK_AGE_MS } from '../server/hook-inbox.js';
 
 async function setup(t) {
-  const directory = await mkdtemp(join(tmpdir(), 'photosynth-hook-test-'));
+  const directory = await mkdtemp(join(tmpdir(), 'systrudel-hook-test-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
   return directory;
 }
@@ -50,7 +50,7 @@ test('uncommitted temporary files never become agent events', async t => {
 });
 test('the actual IDE hook command delivers without HTTP credentials or a running companion', async t => {
   const directory = await setup(t);
-  const child = spawn(process.execPath, [fileURLToPath(new URL('../scripts/codex-hook.js', import.meta.url))], { windowsHide: true, env: { ...process.env, PHOTOSYNTH_HOOK_INBOX: directory }, stdio: ['pipe', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, [fileURLToPath(new URL('../scripts/codex-hook.js', import.meta.url))], { windowsHide: true, env: { ...process.env, SYSTRUDEL_HOOK_INBOX: directory }, stdio: ['pipe', 'pipe', 'pipe'] });
   let output = '';
   child.stdout.on('data', bytes => { output += bytes; });
   child.stderr.on('data', bytes => { output += bytes; });

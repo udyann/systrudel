@@ -16,11 +16,11 @@ export function readConfig(env = process.env) {
     return value;
   };
   const config = {
-    uiPort: port('PHOTOSYNTH_UI_PORT', 5173),
-    companionPort: port('PHOTOSYNTH_COMPANION_PORT', 4317),
-    previewPort: port('PHOTOSYNTH_PREVIEW_PORT', 4173),
+    uiPort: port('SYSTRUDEL_UI_PORT', 5173),
+    companionPort: port('SYSTRUDEL_COMPANION_PORT', 4317),
+    previewPort: port('SYSTRUDEL_PREVIEW_PORT', 4173),
   };
-  if (new Set(Object.values(config)).size !== 3) throw new Error('PhotoSynthRudel UI, companion and preview ports must be different.');
+  if (new Set(Object.values(config)).size !== 3) throw new Error('systrudel UI, companion and preview ports must be different.');
   return config;
 }
 

@@ -2,7 +2,7 @@ const age = seconds => seconds < 60 ? `${Math.floor(seconds)}s` : seconds < 3600
 const eventNames = { session_start: 'session opened', turn_start: 'turn started', turn_end: 'turn finished', tool_start: 'tool started', tool_end: 'tool finished', subagent_start: 'subagent started', subagent_end: 'subagent finished', disconnect: 'session closed', heartbeat: 'feed seen', output: 'output received', tokens: 'usage received' };
 
 export function agentPresentation(agent, companionOnline = true) {
-  if (!companionOnline) return { title: 'Companion offline', detail: 'Start PhotoSynthRudel to receive IDE activity.', readings: [] };
+  if (!companionOnline) return { title: 'Companion offline', detail: 'Start systrudel to receive IDE activity.', readings: [] };
   const status = agent?.status ?? 'waiting';
   const last = Number.isFinite(agent?.lastEventAgeSeconds) ? `Last activity: ${eventNames[agent.lastEventKind] ?? 'event received'}, ${age(agent.lastEventAgeSeconds)} ago.` : '';
   const titles = { waiting: 'Waiting for IDE activity', working: 'Working', idle: 'Idle', unknown: 'Status unknown' };
