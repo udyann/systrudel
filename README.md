@@ -33,6 +33,13 @@ Camera/image 입력도 사용할 수 있지만, 현재는 주요 입력이 아�
 
 이 입력들은 smoothing 및 mapping을 거쳐 Strudel의 rhythm, melody, velocity, filter, distortion, envelope 등의 파라미터에 반영됩니다.
 
+전체적인 음색 및 볼륨부터, 드럼/베이스/신스의 패턴과 음정들도 함께 변화합니다.
+
+
+## Demo
+<video src="./demo.mp4" controls width="100%"></video>
+
+
 ## Dependencies
 
 - Windows
